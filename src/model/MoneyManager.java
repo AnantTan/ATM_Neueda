@@ -103,4 +103,9 @@ public class MoneyManager implements Manager{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public int getTotalMoneyInAtm()
+	{
+		return totalMoneyInTheAtm;
+	}
 }

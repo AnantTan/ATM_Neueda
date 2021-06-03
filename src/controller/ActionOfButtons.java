@@ -39,8 +39,21 @@ public class ActionOfButtons implements ActionListener {
 
 			// could also use 'system.exit(0)' if the program is supposed to stop here
 		} else if (e.getActionCommand().equals("cashWithdrawl")) {
+			MoneyManager manager = new MoneyManager(0);
+			
+			// if there is no money left in the ATM
+			// then do  not open the withdraw window
+			// show a message
+			if(manager.getTotalMoneyInAtm()<5)
+			{
+				// message
+				JOptionPane.showMessageDialog(null, "There is no money left in the MACHINE", "No money",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			else {
 			atmMachineGui = new AtmMachineGUI();
-			atmMachineGui.cashWtihdrawlGui();
+			atmMachineGui.cashWtihdrawlGui(); // open cash withdraw window
+			}
 		} else if (e.getActionCommand().equals("withdraw")) {
 			// getting the withdrawal amount requested from the text field
 			// converting it into integer then passing it to money exchanger
