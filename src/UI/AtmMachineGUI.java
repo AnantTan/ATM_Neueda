@@ -25,6 +25,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import controller.ActionOfButtons;
+import model.AccountAndCredentialManager;
 
 public class AtmMachineGUI {
 
@@ -55,15 +56,14 @@ public class AtmMachineGUI {
 
 		accountNumberTextField = new JTextField();
 		accountNumberTextField.grabFocus();
-		; // first field to take in input should be this
+		// first field to take in input should be this
 
 		pinField = new JPasswordField();
 
 		loginButton = new JButton("Login");
 		loginButton.addActionListener(actionOfButtons);
 		loginButton.setActionCommand("login");
-		loginFrame.getRootPane().setDefaultButton(loginButton); // pressing enter on the keyboard will trigger the login
-																// button
+		loginFrame.getRootPane().setDefaultButton(loginButton); // pressing enter will trigger the login button
 
 		resetButton = new JButton("Reset");
 		resetButton.addActionListener(actionOfButtons);
@@ -92,22 +92,26 @@ public class AtmMachineGUI {
 		loginFrame.setDefaultCloseOperation(loginFrame.EXIT_ON_CLOSE);
 	}
 
-	@SuppressWarnings("static-access")
+	@SuppressWarnings({ "static-access", "deprecation" })
 	public void userAccountGui() {
-		loginFrame.dispose(); // close the login frame once the user is on its dash board
+		loginFrame.disable();; // close the login frame once the user is on its dash board
 		resetDetails(); // remove the credentials
 
 		menuBar = new JMenuBar();
 
 		money = new JMenu("Money");
 		myAccount = new JMenu("My Account");
-		userName = new JMenu("UserName");
+		// getting current user name to be shown on the dash board
+		userName = new JMenu(AccountAndCredentialManager.getInstance().getCurrentUser().getAccountHolderName());
 
 		cashWithdraw = new JMenuItem("Cash Withdrwal");
 		cashWithdraw.addActionListener(actionOfButtons);
 		cashWithdraw.setActionCommand("cashWithdrawl");
 
 		balance = new JMenuItem("Check Balance");
+		balance.addActionListener(actionOfButtons);
+		balance.setActionCommand("check balance");
+
 		deposit = new JMenuItem("Deposit");
 		details = new JMenuItem("Details");
 		transactions = new JMenuItem("Transactions");
@@ -117,6 +121,7 @@ public class AtmMachineGUI {
 		logoutUser.setActionCommand("logout");
 
 		money.add(cashWithdraw);
+
 		money.add(balance);
 		money.add(deposit);
 
@@ -155,8 +160,7 @@ public class AtmMachineGUI {
 		withdrawButton = new JButton("Withdraw");
 		withdrawButton.addActionListener(actionOfButtons);
 		withdrawButton.setActionCommand("withdraw");
-		userAccountFrame.getRootPane().setDefaultButton(withdrawButton); // pressing enter on the keyboard will trigger
-																			// the login button
+		userAccountFrame.getRootPane().setDefaultButton(withdrawButton); // pressing enter will trigger login button
 
 		panelOne.add(withdrawalAmountLabel);
 		panelOne.add(withdrawalAmountText);
@@ -168,14 +172,27 @@ public class AtmMachineGUI {
 	}
 
 	@SuppressWarnings("deprecation")
-	public void dispensedNotesGui(HashMap<Integer, Integer> dispensedNotes) {
-		
+	public void dispensedNotesGui(HashMap<Integer, Integer> dispensedNotes, int dispensingAmount) {
+
+		panelOne = new JPanel();
+		panelOne.setBorder(BorderFactory.createTitledBorder("Notes and their numbers that you should recieve"));
+
 		JTable table = new JTable(toTableModel(dispensedNotes));
-		table.disable(); // disable the columns of the table 
-		
+		table.disable(); // disable the columns of the table
+
 		userAccountFrame.getContentPane().removeAll();
-		userAccountFrame.getContentPane().add( new JScrollPane( table), BorderLayout.CENTER );
+		userAccountFrame.getContentPane().add(panelOne, BorderLayout.NORTH);
+		userAccountFrame.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
 		userAccountFrame.getContentPane().revalidate();
+		JOptionPane.showMessageDialog(null, "Please collect your cash !", "Dispensing " + dispensingAmount + "€",
+				JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public void checkBalanceGui() {
+		JOptionPane.showMessageDialog(null,
+				"You current balance is "
+						+ AccountAndCredentialManager.getInstance().getCurrentUser().getAmountInAccount() + "€",
+				"Total balance ", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private TableModel toTableModel(HashMap<Integer, Integer> dispensedNotes) {
