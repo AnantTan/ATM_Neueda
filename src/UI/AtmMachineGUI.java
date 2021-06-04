@@ -34,10 +34,11 @@ public class AtmMachineGUI {
 	public static JFrame loginFrame = new JFrame();
 	public static JFrame userAccountFrame = new JFrame();
 	private JPanel panelOne, panelTwo;
-	private JButton loginButton, resetButton, withdrawButton;
-	private JLabel accountNumberLabel, pinLabel, withdrawalAmountLabel,accountHolderLabel,currentBalanceLabel,overdraftAmountLabel;
-	public static JTextField accountNumberTextField, withdrawalAmountText;
-	private JTextField accountHolderField, currentBalanceField,overdraftAmountField;
+	private JButton loginButton, resetButton, withdrawButton, depositButton;
+	private JLabel accountNumberLabel, pinLabel, withdrawalAmountLabel, accountHolderLabel, currentBalanceLabel,
+			overdraftAmountLabel, depositAmountLabel;
+	public static JTextField accountNumberTextField, withdrawalAmountTextField, depositAmountTextField;
+	private JTextField accountHolderField, currentBalanceField, overdraftAmountField,accountNumberDetailTextField;
 	public static JPasswordField pinField;
 	private JMenuBar menuBar;
 	private JMenu money, myAccount, userName;
@@ -96,7 +97,8 @@ public class AtmMachineGUI {
 
 	@SuppressWarnings({ "static-access", "deprecation" })
 	public void userAccountGui() {
-		loginFrame.disable();; // close the login frame once the user is on its dash board
+		loginFrame.disable();
+		// close the login frame once the user is on its dash board
 		resetDetails(); // remove the credentials
 
 		menuBar = new JMenuBar();
@@ -114,12 +116,14 @@ public class AtmMachineGUI {
 		balance.addActionListener(actionOfButtons);
 		balance.setActionCommand("check balance");
 
-		deposit = new JMenuItem("Deposit");
-		
+		deposit = new JMenuItem("Cash Deposit");
+		deposit.addActionListener(actionOfButtons);
+		deposit.setActionCommand("depositCash");
+
 		details = new JMenuItem("Details");
 		details.addActionListener(actionOfButtons);
 		details.setActionCommand("details");
-		
+
 		transactions = new JMenuItem("Transactions");
 
 		logoutUser = new JMenuItem("Logout");
@@ -157,19 +161,19 @@ public class AtmMachineGUI {
 		userAccountFrame.getContentPane().removeAll(); // remove any tiles that were here before this
 
 		panelOne = new JPanel(new GridLayout(1, 1));
-		panelOne.setBorder(BorderFactory.createTitledBorder("Please enter the below and press withdraw"));
+		panelOne.setBorder(BorderFactory.createTitledBorder("Please enter the amount below and press withdraw"));
 		panelTwo = new JPanel();
 
 		withdrawalAmountLabel = new JLabel("Enter the amount");
-		withdrawalAmountText = new JTextField();
+		withdrawalAmountTextField = new JTextField();
 
 		withdrawButton = new JButton("Withdraw");
 		withdrawButton.addActionListener(actionOfButtons);
 		withdrawButton.setActionCommand("withdraw");
-		userAccountFrame.getRootPane().setDefaultButton(withdrawButton); // pressing enter will trigger login button
+		userAccountFrame.getRootPane().setDefaultButton(withdrawButton); // pressing enter will trigger withdraw button
 
 		panelOne.add(withdrawalAmountLabel);
-		panelOne.add(withdrawalAmountText);
+		panelOne.add(withdrawalAmountTextField);
 		panelTwo.add(withdrawButton);
 
 		userAccountFrame.getContentPane().add(panelOne);
@@ -190,7 +194,7 @@ public class AtmMachineGUI {
 		userAccountFrame.getContentPane().add(panelOne, BorderLayout.NORTH);
 		userAccountFrame.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
 		userAccountFrame.getContentPane().revalidate();
-		
+
 		JOptionPane.showMessageDialog(null, "Please collect your cash !", "Dispensing " + dispensingAmount + "€",
 				JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -201,29 +205,28 @@ public class AtmMachineGUI {
 						+ AccountAndCredentialManager.getInstance().getCurrentUser().getAmountInAccount() + "€",
 				"Total balance ", JOptionPane.INFORMATION_MESSAGE);
 	}
-	
-	public void showAccountDetails()
-	{
-		panelOne = new JPanel(new GridLayout(4,4));
-		
+
+	public void showAccountDetails() {
+		panelOne = new JPanel(new GridLayout(4, 4));
+
 		accountNumberLabel = new JLabel("Account No.");
-		accountNumberTextField = new JTextField();
-		accountNumberTextField.setEditable(false);
-		
+		accountNumberDetailTextField = new JTextField();
+		accountNumberDetailTextField.setEditable(false);
+
 		accountHolderLabel = new JLabel("Account Holder");
 		accountHolderField = new JTextField();
 		accountHolderField.setEditable(false);
-		
+
 		currentBalanceLabel = new JLabel("Current Bal.");
 		currentBalanceField = new JTextField();
 		currentBalanceField.setEditable(false);
-		
+
 		overdraftAmountLabel = new JLabel("Overdraft Amt.");
 		overdraftAmountField = new JTextField();
 		overdraftAmountField.setEditable(false);
-		
+
 		panelOne.add(accountNumberLabel);
-		panelOne.add(accountNumberTextField);
+		panelOne.add(accountNumberDetailTextField);
 
 		panelOne.add(accountHolderLabel);
 		panelOne.add(accountHolderField);
@@ -235,15 +238,50 @@ public class AtmMachineGUI {
 		panelOne.add(overdraftAmountField);
 
 		setUpTheDetails(AccountAndCredentialManager.getInstance().getCurrentUser());
-		
+
 		userAccountFrame.getContentPane().removeAll();
 		userAccountFrame.getContentPane().add(panelOne, BorderLayout.CENTER);
 		userAccountFrame.getContentPane().revalidate();
 	}
 
+	public void cashDepositGui() {
+
+		userAccountFrame.getContentPane().removeAll(); // remove any tiles that were here before this
+
+		panelOne = new JPanel(new GridLayout(1, 1));
+		panelOne.setBorder(BorderFactory.createTitledBorder("Please enter the deposit amount below"));
+		panelTwo = new JPanel();
+
+		depositAmountLabel = new JLabel("Deposit amount");
+		depositAmountTextField = new JTextField();
+
+		depositButton = new JButton("Deposit");
+		depositButton.addActionListener(actionOfButtons);
+		depositButton.setActionCommand("deposit");
+		userAccountFrame.getRootPane().setDefaultButton(depositButton); // pressing enter will trigger deposit button
+
+		panelOne.add(depositAmountLabel);
+		panelOne.add(depositAmountTextField);
+		panelTwo.add(depositButton);
+
+		userAccountFrame.getContentPane().add(panelOne);
+		userAccountFrame.getContentPane().add(panelTwo, BorderLayout.SOUTH);
+		userAccountFrame.revalidate(); // refresh the content pane after adding these tiles
+	}
+	
+	public void depositedAmountMessage(int depositedAmount) {
+	
+		showAccountDetails();
+		JOptionPane.showMessageDialog(null,
+				"You current balance is "
+						+ AccountAndCredentialManager.getInstance().getCurrentUser().getAmountInAccount() + "€",
+				"Deposited "+depositedAmount+"€", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+
 	private void setUpTheDetails(AccountsBuilder currentUser) {
 
-		accountNumberTextField.setText(String.valueOf(currentUser.getAccountNumber()));
+		accountNumberDetailTextField.setText(String.valueOf(currentUser.getAccountNumber()));
 		accountHolderField.setText(currentUser.getAccountHolderName());
 		currentBalanceField.setText(String.valueOf(currentUser.getAmountInAccount()));
 		overdraftAmountField.setText(String.valueOf(currentUser.getOverdraftAmount()));

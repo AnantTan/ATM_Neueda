@@ -13,15 +13,17 @@ public class MoneyManager implements Manager {
 	// using a linked hash map to maintain the order in which the money is inserted
 	// it helps in iteration later on
 	private static LinkedHashMap<Integer, Integer> moneyDenominationsMap = new LinkedHashMap<Integer, Integer>();
-	private int withdrawalAmount;
-	private final int dispensingAmount;
+	private int withdrawalAmount, depositAmount;
+	private final int dispensingAmount, depositedAmount;
 	private AccountsBuilder currentUser;
 	private AtmMachineGUI atmMachineGUI;
 
-	public MoneyManager(int withdrawalAmount) {
+	public MoneyManager(int withdrawalAmount, int depositAmount) {
 
 		this.withdrawalAmount = withdrawalAmount; // to be used for calculations during withdrawal
 		this.dispensingAmount = withdrawalAmount; // to be used later in a message
+		this.depositAmount = depositAmount; // this will be used for calculation
+		this.depositedAmount = depositAmount; // this will be added to the machine
 		this.currentUser = AccountAndCredentialManager.getInstance().getCurrentUser(); // current user
 	}
 
@@ -99,30 +101,59 @@ public class MoneyManager implements Manager {
 				notesToBeDispensedOfAnotherDenomination = 0; // resetting the counter to prevent any value carry over
 			}
 		}
+		// after whole operation is done
+		// remove this amount from the ATM
 		totalMoneyInTheAtm -= dispensingAmount;
 
 		// if you want to check the number of notes being changed after a transaction
 		// uncomment the following method
-		// showTheLeftNotes();
+		 //showTheLeftNotes();
 
 		// update the user balance after the money has been dispensed
 		AccountAndCredentialManager.getInstance().updateUserBalance(dispensingAmount);
+		
+		// show the dispensed cash format and go back
 		atmMachineGUI = new AtmMachineGUI();
 		atmMachineGUI.dispensedNotesGui(dispensedNotesMap, dispensingAmount);
 	}
 
 	// show the number of notes left in the machine after transaction
-	/*
-	 * private void showTheLeftNotes() { for (HashMap.Entry<Integer, Integer> entry
-	 * : moneyDenominationsMap.entrySet()) {
-	 * System.out.println("No of  notes left of " + entry.getKey() + " : " +
-	 * entry.getValue()); } }
-	 */
+
+	/*private void showTheLeftNotes() {
+		for (HashMap.Entry<Integer, Integer> entry : moneyDenominationsMap.entrySet()) {
+			System.out.println("No of  notes left of " + entry.getKey() + " : " + entry.getValue());
+		}
+	}*/
 
 	@Override
 	public void processCashDeposit() {
-		// TODO Auto-generated method stub
 
+		int numberOfNotes = 0;
+		for (HashMap.Entry<Integer, Integer> entry : moneyDenominationsMap.entrySet()) {
+
+			if (depositAmount != 0) {
+
+				// getting the number of notes that will be deposited of this note
+				// number of notes that will be added for this note
+				numberOfNotes = depositAmount / entry.getKey();
+
+				// adding the notes to the map (ATM) that have been deposited
+				moneyDenominationsMap.put(entry.getKey(), moneyDenominationsMap.get(entry.getKey()) + numberOfNotes);
+
+				// left over amount to be deposited
+				depositAmount = depositAmount % entry.getKey();
+
+				numberOfNotes = 0; // resetting the counter to prevent any value carry over
+			}
+		}
+		totalMoneyInTheAtm += depositedAmount;
+
+		// update the user balance after the money has been deposited
+		AccountAndCredentialManager.getInstance().amountDeposited(depositedAmount);
+		
+		// go back and show some message
+		atmMachineGUI = new AtmMachineGUI();
+		atmMachineGUI.depositedAmountMessage(depositedAmount);
 	}
 
 	public int getTotalMoneyInAtm() {

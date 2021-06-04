@@ -7,7 +7,7 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		AccountAndCredentialManager.getInstance().generatingDefaultAccounts();
-		new MoneyManager(0).setUpMoneyInAtm();
+		new MoneyManager(0,0).setUpMoneyInAtm();
 		new AtmMachineGUI().loginWindow();;
 	}
 }

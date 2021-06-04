@@ -86,6 +86,12 @@ public enum AccountAndCredentialManager {
 		// subtracting amount withdrawn from the current balance to get new balance
 		currentUser.updateBankBalance(currentUser.getAmountInAccount() - amountWithdrawn);
 	}
+	
+	public void amountDeposited(int depositedAmount)
+	{
+		// adding amount deposited to the current balance to get new balance
+		currentUser.updateBankBalance(currentUser.getAmountInAccount() + depositedAmount);
+	}
 
 	// return the current user that is logged in
 	public AccountsBuilder getCurrentUser() {
