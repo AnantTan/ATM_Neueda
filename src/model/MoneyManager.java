@@ -7,6 +7,9 @@ import UI.AtmMachineGUI;
 import builder.AccountsBuilder;
 import interfaces.Manager;
 
+// this class is responsible for managing the money
+// transactions are processed from this class
+
 public class MoneyManager implements Manager {
 
 	private static int totalMoneyInTheAtm;
@@ -107,11 +110,11 @@ public class MoneyManager implements Manager {
 
 		// if you want to check the number of notes being changed after a transaction
 		// uncomment the following method
-		 //showTheLeftNotes();
+		// showTheLeftNotes();
 
 		// update the user balance after the money has been dispensed
 		AccountAndCredentialManager.getInstance().updateUserBalance(dispensingAmount);
-		
+
 		// show the dispensed cash format and go back
 		atmMachineGUI = new AtmMachineGUI();
 		atmMachineGUI.dispensedNotesGui(dispensedNotesMap, dispensingAmount);
@@ -119,12 +122,14 @@ public class MoneyManager implements Manager {
 
 	// show the number of notes left in the machine after transaction
 
-	/*private void showTheLeftNotes() {
-		for (HashMap.Entry<Integer, Integer> entry : moneyDenominationsMap.entrySet()) {
-			System.out.println("No of  notes left of " + entry.getKey() + " : " + entry.getValue());
-		}
-	}*/
+	/*
+	 * private void showTheLeftNotes() { for (HashMap.Entry<Integer, Integer> entry
+	 * : moneyDenominationsMap.entrySet()) {
+	 * System.out.println("No of  notes left of " + entry.getKey() + " : " +
+	 * entry.getValue()); } }
+	 */
 
+	// this method is responsible for depositing cash
 	@Override
 	public void processCashDeposit() {
 
@@ -150,12 +155,13 @@ public class MoneyManager implements Manager {
 
 		// update the user balance after the money has been deposited
 		AccountAndCredentialManager.getInstance().amountDeposited(depositedAmount);
-		
+
 		// go back and show some message
 		atmMachineGUI = new AtmMachineGUI();
 		atmMachineGUI.depositedAmountMessage(depositedAmount);
 	}
 
+	// return total money in the ATM
 	public int getTotalMoneyInAtm() {
 		return totalMoneyInTheAtm;
 	}

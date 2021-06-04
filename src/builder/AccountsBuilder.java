@@ -1,13 +1,17 @@
 package builder;
 
+// this class is responsible for creating and updating the user objects
+
 public class AccountsBuilder {
 
+	// user details
 	private int accountNumber;
 	private String accountHolder;
 	private int amountInAccount;
 	private int pin;
 	private int overdraftAmount;
 
+	// private constructor to create builder pattern
 	private AccountsBuilder(AccountBuilderClass accountsBuilderClass) {
 		this.accountHolder = accountsBuilderClass.accountHolder;
 		this.accountNumber = accountsBuilderClass.accountNumber;
@@ -15,6 +19,8 @@ public class AccountsBuilder {
 		this.pin = accountsBuilderClass.pin;
 		this.overdraftAmount = accountsBuilderClass.overdraftAmount;
 	}
+
+	// getters
 
 	public int getAccountNumber() {
 		return accountNumber;
@@ -39,12 +45,15 @@ public class AccountsBuilder {
 	// a little hole to update the user's balance easily
 	// (please read AccountAndCredentialManager's method updateUserBalance for
 	// related info)
-	
+
 	public void updateBankBalance(int remainingBalance) {
 		this.amountInAccount = remainingBalance;
 	}
 
+	// static class for creating the objects
 	public static class AccountBuilderClass {
+
+		// user details
 		private int accountNumber;
 		private String accountHolder;
 		private int amountInAccount;
@@ -75,6 +84,7 @@ public class AccountsBuilder {
 		 * this.overdraftAmount = accountsBuilder.getOverdraftAmount(); }
 		 */
 
+		// setting up the variables when the creating the object
 		public AccountBuilderClass accountNumber(int accountNumber) {
 			this.accountNumber = accountNumber;
 			return this;
@@ -100,6 +110,7 @@ public class AccountsBuilder {
 			return this;
 		}
 
+		// return the object of parent class
 		public AccountsBuilder build() {
 			return new AccountsBuilder(this);
 		}

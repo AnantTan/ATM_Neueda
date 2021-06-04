@@ -9,9 +9,13 @@ import UI.AtmMachineGUI;
 import model.AccountAndCredentialManager;
 import model.MoneyManager;
 
+// this class is control center of the ATM
+// this class looks after the UI 
+
 public class ActionOfButtons implements ActionListener {
 
 	private AtmMachineGUI atmMachineGui;
+	// having the same manager throughout the course
 	private static UserInputManager inputManager = new UserInputManager();
 
 	@SuppressWarnings({ "deprecation", "static-access" })
@@ -19,6 +23,7 @@ public class ActionOfButtons implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 
+		// go to reset method
 		if (e.getActionCommand().equals("reset")) {
 			AtmMachineGUI.resetDetails();
 		} else if (e.getActionCommand().equals("login")) {
@@ -51,8 +56,9 @@ public class ActionOfButtons implements ActionListener {
 			AtmMachineGUI.loginFrame.enable(); // enable the login window again
 
 			// could also use 'system.exit(0)' if the program is supposed to stop here
+
 		} else if (e.getActionCommand().equals("cashWithdrawl")) {
-			MoneyManager manager = new MoneyManager(0, 0);
+			MoneyManager manager = new MoneyManager(0, 0); // instance of money manager class
 
 			// if there is no money left in the ATM
 			// then do not open the withdraw window
@@ -122,9 +128,15 @@ public class ActionOfButtons implements ActionListener {
 							JOptionPane.ERROR_MESSAGE);
 			} else
 				showInputErrorMessage();
+		} else if (e.getActionCommand().equals("transactions")) {
+			atmMachineGui = new AtmMachineGUI();
+
+			// get the transaction map from the credential manager class
+			atmMachineGui.transactionsGui(AccountAndCredentialManager.getInstance().getTransactionMap());
 		}
 	}
 
+	// show a generic error message
 	private void showInputErrorMessage() {
 		JOptionPane.showMessageDialog(null, "Please provide a valid input (ATM takes only numbers!)", "Inalid input",
 				JOptionPane.ERROR_MESSAGE);
