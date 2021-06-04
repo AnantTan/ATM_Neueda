@@ -7,7 +7,7 @@ import UI.AtmMachineGUI;
 import builder.AccountsBuilder;
 import interfaces.Manager;
 
-public class MoneyManager implements Manager{
+public class MoneyManager implements Manager {
 
 	private static int totalMoneyInTheAtm;
 	// using a linked hash map to maintain the order in which the money is inserted
@@ -57,55 +57,75 @@ public class MoneyManager implements Manager{
 
 		HashMap<Integer, Integer> dispensedNotesMap = new HashMap<Integer, Integer>();
 		int numberOfNotes = 0;
+		int notesToBeDispensedOfAnotherDenomination = 0;
 		// getting the entry set of the linked hash map which is all the notes that can
 		// be dispensed
 		for (HashMap.Entry<Integer, Integer> entry : moneyDenominationsMap.entrySet()) {
 
 			if (withdrawalAmount != 0) {
-			
+
 				// if the amount is higher than the current note
 				if (withdrawalAmount >= entry.getKey())
-				
+
 					// getting the number of notes that will be dispensed for this note
-					numberOfNotes = withdrawalAmount / entry.getKey(); // number of notes that will be dispensed for this note
-					System.out.println("No of " + entry.getKey() + "'s" + " :" + numberOfNotes);
+					// number of notes that will be dispensed for this note
+					numberOfNotes = withdrawalAmount / entry.getKey();
+
+				// if the notes of this denomination are not left in the machine
+				// if the numberOfNotes is more than the notes present of this denomination
+				// dispense the maximum number of notes present
+				// and calculate the notes left of this denomination
+				// this prevents the the number of notes to go in negative logically
+				if (numberOfNotes > entry.getValue()) {
+					// the maximum number of these notes will
+					numberOfNotes = entry.getValue();
+
+					// calculating the notes left of this denomination
+					notesToBeDispensedOfAnotherDenomination = (withdrawalAmount / entry.getKey()) - entry.getValue();
+				}
+
 				dispensedNotesMap.put(entry.getKey(), numberOfNotes); // putting the note and its number in the map
-				
+
 				// removing the notes from the map (ATM) that have been dispensed
-				moneyDenominationsMap.put(entry.getKey(), moneyDenominationsMap.get(entry.getKey())-numberOfNotes);
+				moneyDenominationsMap.put(entry.getKey(), moneyDenominationsMap.get(entry.getKey()) - numberOfNotes);
+
+				// getting the carried over notes of the denomination and adding it to the left
+				// over amount
+				withdrawalAmount = (withdrawalAmount % entry.getKey())
+						+ notesToBeDispensedOfAnotherDenomination * entry.getKey(); // the withdrawal amount that is
+																					// left
 
 				numberOfNotes = 0; // resetting the counter to prevent any value carry over
-				
-				withdrawalAmount = withdrawalAmount % entry.getKey(); // the withdrawal amount that is left
+				notesToBeDispensedOfAnotherDenomination = 0; // resetting the counter to prevent any value carry over
 			}
 		}
 		totalMoneyInTheAtm -= dispensingAmount;
-		
+
 		// if you want to check the number of notes being changed after a transaction
 		// uncomment the following method
-		showTheLeftNotes();
-		
-		// update the user balance after the money has been dispensed	
+		// showTheLeftNotes();
+
+		// update the user balance after the money has been dispensed
 		AccountAndCredentialManager.getInstance().updateUserBalance(dispensingAmount);
 		atmMachineGUI = new AtmMachineGUI();
-		atmMachineGUI.dispensedNotesGui(dispensedNotesMap,dispensingAmount);
+		atmMachineGUI.dispensedNotesGui(dispensedNotesMap, dispensingAmount);
 	}
-	
-	private void showTheLeftNotes()
-	{
-		for (HashMap.Entry<Integer, Integer> entry : moneyDenominationsMap.entrySet()) {
-			System.out.println("No of  notes left of " + entry.getKey() + " : " + entry.getValue());
-		}
-	}
+
+	// show the number of notes left in the machine after transaction
+	/*
+	 * private void showTheLeftNotes() { for (HashMap.Entry<Integer, Integer> entry
+	 * : moneyDenominationsMap.entrySet()) {
+	 * System.out.println("No of  notes left of " + entry.getKey() + " : " +
+	 * entry.getValue()); } }
+	 */
 
 	@Override
 	public void processCashDeposit() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	public int getTotalMoneyInAtm()
-	{
+
+	public int getTotalMoneyInAtm() {
 		return totalMoneyInTheAtm;
 	}
 }

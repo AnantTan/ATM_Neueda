@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import builder.AccountsBuilder;
 import controller.ActionOfButtons;
 import model.AccountAndCredentialManager;
 
@@ -34,8 +35,9 @@ public class AtmMachineGUI {
 	public static JFrame userAccountFrame = new JFrame();
 	private JPanel panelOne, panelTwo;
 	private JButton loginButton, resetButton, withdrawButton;
-	private JLabel accountNumberLabel, pinLabel, withdrawalAmountLabel;
+	private JLabel accountNumberLabel, pinLabel, withdrawalAmountLabel,accountHolderLabel,currentBalanceLabel,overdraftAmountLabel;
 	public static JTextField accountNumberTextField, withdrawalAmountText;
+	private JTextField accountHolderField, currentBalanceField,overdraftAmountField;
 	public static JPasswordField pinField;
 	private JMenuBar menuBar;
 	private JMenu money, myAccount, userName;
@@ -113,7 +115,11 @@ public class AtmMachineGUI {
 		balance.setActionCommand("check balance");
 
 		deposit = new JMenuItem("Deposit");
+		
 		details = new JMenuItem("Details");
+		details.addActionListener(actionOfButtons);
+		details.setActionCommand("details");
+		
 		transactions = new JMenuItem("Transactions");
 
 		logoutUser = new JMenuItem("Logout");
@@ -184,6 +190,7 @@ public class AtmMachineGUI {
 		userAccountFrame.getContentPane().add(panelOne, BorderLayout.NORTH);
 		userAccountFrame.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
 		userAccountFrame.getContentPane().revalidate();
+		
 		JOptionPane.showMessageDialog(null, "Please collect your cash !", "Dispensing " + dispensingAmount + "€",
 				JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -193,6 +200,53 @@ public class AtmMachineGUI {
 				"You current balance is "
 						+ AccountAndCredentialManager.getInstance().getCurrentUser().getAmountInAccount() + "€",
 				"Total balance ", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	public void showAccountDetails()
+	{
+		panelOne = new JPanel(new GridLayout(4,4));
+		
+		accountNumberLabel = new JLabel("Account No.");
+		accountNumberTextField = new JTextField();
+		accountNumberTextField.setEditable(false);
+		
+		accountHolderLabel = new JLabel("Account Holder");
+		accountHolderField = new JTextField();
+		accountHolderField.setEditable(false);
+		
+		currentBalanceLabel = new JLabel("Current Bal.");
+		currentBalanceField = new JTextField();
+		currentBalanceField.setEditable(false);
+		
+		overdraftAmountLabel = new JLabel("Overdraft Amt.");
+		overdraftAmountField = new JTextField();
+		overdraftAmountField.setEditable(false);
+		
+		panelOne.add(accountNumberLabel);
+		panelOne.add(accountNumberTextField);
+
+		panelOne.add(accountHolderLabel);
+		panelOne.add(accountHolderField);
+
+		panelOne.add(currentBalanceLabel);
+		panelOne.add(currentBalanceField);
+
+		panelOne.add(overdraftAmountLabel);
+		panelOne.add(overdraftAmountField);
+
+		setUpTheDetails(AccountAndCredentialManager.getInstance().getCurrentUser());
+		
+		userAccountFrame.getContentPane().removeAll();
+		userAccountFrame.getContentPane().add(panelOne, BorderLayout.CENTER);
+		userAccountFrame.getContentPane().revalidate();
+	}
+
+	private void setUpTheDetails(AccountsBuilder currentUser) {
+
+		accountNumberTextField.setText(String.valueOf(currentUser.getAccountNumber()));
+		accountHolderField.setText(currentUser.getAccountHolderName());
+		currentBalanceField.setText(String.valueOf(currentUser.getAmountInAccount()));
+		overdraftAmountField.setText(String.valueOf(currentUser.getOverdraftAmount()));
 	}
 
 	private TableModel toTableModel(HashMap<Integer, Integer> dispensedNotes) {

@@ -62,6 +62,11 @@ public class ActionOfButtons implements ActionListener {
 			atmMachineGui = new AtmMachineGUI();
 			atmMachineGui.checkBalanceGui();
 		}
+		else if(e.getActionCommand().equals("details"))
+		{
+			atmMachineGui = new AtmMachineGUI();
+			atmMachineGui.showAccountDetails();
+		}
 	}
 
 }
